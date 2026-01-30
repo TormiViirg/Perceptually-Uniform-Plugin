@@ -1,62 +1,109 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="--container-max: 900px; --bg-color: {{ theme.bg }}; --text-color: {{ theme.text }};">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Image RGB to CSV + Color Stats</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 2rem; max-width: 900px; }
-    .card { border: 1px solid #ddd; padding: 1rem; border-radius: 12px; }
-    .msg { margin: 0.5rem 0; padding: 0.6rem; border-radius: 10px; background: #f6f6f6; }
-    .error { background: #ffe7e7; }
-    .ok { background: #e7ffe7; }
-    label { display: block; margin-top: 1rem; font-weight: 700; }
-    input[type=file], input[type=number] { margin-top: 0.5rem; }
-    button { margin-top: 1rem; padding: 0.7rem 1.1rem; border-radius: 10px; border: 1px solid #333; cursor: pointer; }
-    small { color: #555; }
-    .row { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .row > div { min-width: 260px; flex: 1; }
-  </style>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-  <h1>Upload an Image → Export Pixel RGB + Color Statistics</h1>
+  <div class="container">
 
-  <div class="card">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="msg {{category}}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <h1>Upload an Image → Export Pixel RGB + Color Statistics</h1>
 
-    <form method="post" action="{{ url_for('main.upload') }}" enctype="multipart/form-data">
-      <label>Choose an image</label>
-      <input type="file" name="image" accept="image/*" required>
+    <div class="card">
+      <h2 style="margin-top:0;">Theme</h2>
 
-      <div class="row">
-        <div>
-          <label>
-            <input type="checkbox" name="include_alpha" value="1" {% if include_alpha_default %}checked{% endif %}>
-            Include alpha channel (RGBA)
-          </label>
-          <small>If checked, colors are counted as RGBA tuples and CSV includes an “a” column.</small>
+      <div class="theme-picker">
+        <div class="field">
+          <label for="bgHex">Background</label>
+          <div class="color-row">
+            <input id="bgHex" class="mono" type="text" value="{{ theme.bg }}" maxlength="7" spellcheck="false">
+            <input id="bgColor" type="color" value="{{ theme.bg }}">
+          </div>
         </div>
 
-        <div>
-          <label>Show top N colors on results page</label>
-          <input type="number" name="top_n" min="1" max="{{max_top_n}}" value="{{default_top_n}}" />
-          <small>This only affects what is shown on the page; the summary CSV includes all colors.</small>
+        <div class="field">
+          <label for="textHex">Text</label>
+          <div class="color-row">
+            <input id="textHex" class="mono" type="text" value="{{ theme.text }}" maxlength="7" spellcheck="false">
+            <input id="textColor" type="color" value="{{ theme.text }}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button type="button" id="saveThemeBtn">Save theme</button>
+          <div class="dim" style="margin-top:0.35rem;">
+            Saved to a local JSON file on the server.
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Saved themes</label>
+          <div class="dropdown" id="themeDropdown">
+            <button type="button" class="dropdown-btn" id="themeDropdownBtn">
+              <span class="left">
+                <span class="swatch" id="themeDropdownSwatch"></span>
+                <span class="mono" id="themeDropdownLabel">{{ theme.bg }} / {{ theme.text }}</span>
+              </span>
+              <span class="caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-list" id="themeDropdownList" role="listbox"></div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <button type="submit">Process Image</button>
+    <div class="card">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="msg {{category}}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-      <p><small>
-        Max upload size: {{max_mb}} MB. Allowed extensions: {{exts}}.
-        Pixel-by-pixel CSV can become extremely large for big images.
-      </small></p>
-    </form>
+      <form method="post" action="{{ url_for('main.upload') }}" enctype="multipart/form-data">
+        <label>Choose an image</label>
+        <input type="file" name="image" accept="image/*" required>
+
+        <div class="row">
+          <div>
+            <label>
+              <input type="checkbox" name="include_alpha" value="1" {% if include_alpha_default %}checked{% endif %}>
+              Include alpha channel (RGBA)
+            </label>
+            <small>If checked, colors are counted as RGBA tuples and CSV includes an “a” column.</small>
+          </div>
+
+          <div>
+            <label>Show top N colors on results page</label>
+            <input type="number" name="top_n" min="1" max="{{max_top_n}}" value="{{default_top_n}}" />
+            <small>This only affects what is shown on the page; the summary CSV includes all colors.</small>
+          </div>
+        </div>
+
+        <button type="submit">Process Image</button>
+
+        <p><small>
+          Max upload size: {{max_mb}} MB. Allowed extensions: {{exts}}.
+          Pixel-by-pixel CSV can become extremely large for big images.
+        </small></p>
+      </form>
+    </div>
+
   </div>
+
+  <script>
+    window.THEME_API = {
+      list: "{{ url_for('main.themes_api') }}",
+      add: "{{ url_for('main.themes_add_api') }}",
+      setCurrent: "{{ url_for('main.themes_set_current_api') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
 </html>

@@ -1,8 +1,9 @@
 import os
+import json
+import re
 
 from flask import (
     Blueprint,
-    request,
     send_file,
     render_template,
     flash,
@@ -25,8 +26,112 @@ from .utils import (
 )
 from .processing import process_image_and_write_csvs, read_top_colors_from_summary_csv
 
+from pathlib import Path
+from flask import current_app, jsonify, request
 
 bp = Blueprint("main", __name__)
+
+HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+def _themes_path() -> Path:
+    p = Path(current_app.instance_path) / "themes.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def _default_store():
+    return {
+        "current_id": "default",
+        "themes": [{"id": "default", "bg": "#ffffff", "text": "#111111"}],
+    }
+
+
+def _atomic_write_json(path: Path, data: dict):
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def load_theme_store() -> dict:
+    path = _themes_path()
+    if not path.exists():
+        store = _default_store()
+        _atomic_write_json(path, store)
+        return store
+    try:
+        store = json.loads(path.read_text(encoding="utf-8"))
+        if "themes" not in store or not isinstance(store["themes"], list) or not store["themes"]:
+            raise ValueError("Invalid store")
+        return store
+    except Exception:
+        store = _default_store()
+        _atomic_write_json(path, store)
+        return store
+
+
+def save_theme_store(store: dict):
+    _atomic_write_json(_themes_path(), store)
+
+
+def _validate_hex(value: str, fallback: str) -> str:
+    if not isinstance(value, str):
+        return fallback
+    s = value.strip()
+    if not s.startswith("#"):
+        s = "#" + s
+    return s.lower() if HEX_RE.match(s) else fallback
+
+
+def _theme_id(bg: str, text: str) -> str:
+    return f"{bg.lower()}_{text.lower()}"
+
+
+def get_current_theme() -> dict:
+    store = load_theme_store()
+    cur_id = store.get("current_id")
+    themes = store.get("themes", [])
+    cur = next((t for t in themes if t.get("id") == cur_id), None)
+    return cur or themes[0] if themes else _default_store()["themes"][0]
+
+
+@bp.app_context_processor
+def inject_theme():
+    return {"theme": get_current_theme()}
+
+
+@bp.get("/api/themes")
+def themes_api():
+    return jsonify(load_theme_store())
+
+
+@bp.post("/api/themes")
+def themes_add_api():
+    data = request.get_json(silent=True) or {}
+    bg = _validate_hex(data.get("bg"), "#ffffff")
+    text = _validate_hex(data.get("text"), "#111111")
+
+    store = load_theme_store()
+    tid = _theme_id(bg, text)
+
+    if not any(t.get("id") == tid for t in store["themes"]):
+        store["themes"].append({"id": tid, "bg": bg, "text": text})
+
+    store["current_id"] = tid
+    save_theme_store(store)
+    return jsonify(store)
+
+
+@bp.post("/api/themes/current")
+def themes_set_current_api():
+    data = request.get_json(silent=True) or {}
+    tid = data.get("id")
+
+    store = load_theme_store()
+    if tid and any(t.get("id") == tid for t in store["themes"]):
+        store["current_id"] = tid
+        save_theme_store(store)
+
+    return jsonify(store)
 
 
 @bp.route("/", methods=["GET"])
@@ -185,3 +290,5 @@ def download_file(base: str, kind: str):
 def file_too_large(_err):
     flash(f"Upload too large. Max is {CONFIG.max_upload_mb} MB.", "error")
     return redirect(url_for("main.index"))
+
+
