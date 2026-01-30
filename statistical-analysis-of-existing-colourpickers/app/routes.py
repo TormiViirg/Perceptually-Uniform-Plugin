@@ -31,6 +31,10 @@ bp = Blueprint("main", __name__)
 
 @bp.route("/", methods=["GET"])
 def index():
+    import app.config as cfg
+    print("CONFIG FILE:", cfg.__file__, flush=True)
+    print("RUNTIME max_top_n:", CONFIG.max_top_n_display, flush=True)
+
     ensure_dirs()
     return render_template(
         "upload.html",
@@ -40,6 +44,7 @@ def index():
         max_top_n=CONFIG.max_top_n_display,
         include_alpha_default=CONFIG.include_alpha_default,
     )
+
 
 
 @bp.route("/upload", methods=["POST"])

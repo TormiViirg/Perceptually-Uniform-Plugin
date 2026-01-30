@@ -11,8 +11,8 @@ class AppConfig:
     allowed_exts: Tuple[str, ...] = ("png", "jpg", "jpeg", "bmp", "gif", "tiff", "webp")
 
     # Output defaults
-    default_top_n_display: int = 50      # how many colors to show on the results page
-    max_top_n_display: int = 500         # safety cap for UI rendering
+    default_top_n_display: int = 5000      # how many colors to show on the results page
+    max_top_n_display: int = 5000         # safety cap for UI rendering
     include_alpha_default: bool = False  # default checkbox state
 
     # CSV settings
