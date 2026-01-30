@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Results - Color Stats</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 2rem; max-width: 1100px; }
+    .card { border: 1px solid #ddd; padding: 1rem; border-radius: 12px; margin-bottom: 1.2rem; }
+    .msg { margin: 0.5rem 0; padding: 0.6rem; border-radius: 10px; background: #f6f6f6; }
+    .error { background: #ffe7e7; }
+    .ok { background: #e7ffe7; }
+    a.button {
+      display: inline-block; margin-right: 0.6rem; margin-top: 0.6rem;
+      padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid #333;
+      text-decoration: none; color: inherit;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; }
+    th, td { border-bottom: 1px solid #eee; text-align: left; padding: 0.55rem; vertical-align: middle; }
+    th { position: sticky; top: 0; background: #fff; }
+    .swatch {
+      width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.25);
+      display: inline-block; vertical-align: middle;
+    }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .dim { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Results</h1>
+
+  <div class="card">
+    <div class="dim">
+      Image: <span class="mono">{{ meta.original_filename }}</span>
+    </div>
+    <div style="margin-top: 0.4rem;">
+      Dimensions: <b>{{ meta.width }} × {{ meta.height }}</b> |
+      Total pixels: <b>{{ meta.total_pixels }}</b> |
+      Unique colors: <b>{{ meta.unique_colors }}</b> |
+      Mode: <b>{{ "RGBA" if meta.include_alpha else "RGB" }}</b>
+    </div>
+
+    <div style="margin-top: 0.6rem;">
+      <a class="button" href="{{ url_for('main.download_file', base=base, kind='pixels') }}">Download pixel-by-pixel CSV</a>
+      <a class="button" href="{{ url_for('main.download_file', base=base, kind='summary') }}">Download color summary CSV</a>
+      <a class="button" href="{{ url_for('main.index') }}">Process another image</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top: 0;">Top {{ top_n }} colors</h2>
+    <div class="dim">
+      Summary CSV contains all colors; the table below shows the top {{ top_n }} by frequency.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Swatch</th>
+          <th>RGB{% if meta.include_alpha %}A{% endif %}</th>
+          <th>Hex{% if meta.include_alpha %} + Alpha{% endif %}</th>
+          <th>Count</th>
+          <th>Percent of image</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td><span class="swatch" style="background: {{ row.css_color }};"></span></td>
+            <td class="mono">{{ row.tuple_str }}</td>
+            <td class="mono">{{ row.hex_str }}</td>
+            <td class="mono">{{ row.count }}</td>
+            <td class="mono">{{ "%.6f"|format(row.percent) }}%</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
