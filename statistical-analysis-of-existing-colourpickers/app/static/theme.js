@@ -1,5 +1,3 @@
-// static/theme.js
-
 function isHex6(s){
   return typeof s === "string" && /^#[0-9a-fA-F]{6}$/.test(s.trim());
 }
@@ -66,7 +64,6 @@ function wireColorPair(hexInput, colorInput, onChange){
   hexInput.addEventListener("input", syncFromHex);
   colorInput.addEventListener("input", syncFromPicker);
 
-  // initial normalize
   syncFromHex();
 }
 
@@ -118,7 +115,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const dropdownLabel = document.getElementById("themeDropdownLabel");
 
   if(!bgHex || !bgColor || !textHex || !textColor || !saveBtn || !dropdown || !dropdownBtn || !dropdownList){
-    // Theme UI not present on this page
     return;
   }
 
@@ -130,11 +126,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     dropdownLabel.textContent = `${bg} / ${text}`;
   };
 
-  // Keep inputs in sync + live preview
   wireColorPair(bgHex, bgColor, livePreview);
   wireColorPair(textHex, textColor, livePreview);
 
-  // Dropdown toggle
   dropdownBtn.addEventListener("click", (e) => {
     e.preventDefault();
     dropdown.classList.toggle("open");
@@ -144,26 +138,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(!dropdown.contains(e.target)) closeDropdown(dropdown);
   });
 
-  // Load themes from server and populate dropdown
   async function refreshThemes(){
     const store = await apiGet();
     const themes = store.themes || [];
     const currentId = store.current_id;
 
     buildDropdown(dropdownList, themes, currentId, async (picked) => {
-      // Set current on server
       const updated = await apiSetCurrent(picked.id);
       const cur = (updated.themes || []).find(x => x.id === updated.current_id) || picked;
 
-      // Apply
       bgHex.value = cur.bg; bgColor.value = cur.bg;
       textHex.value = cur.text; textColor.value = cur.text;
       livePreview();
       closeDropdown(dropdown);
-      await refreshThemes(); // update highlight
+      await refreshThemes();
     });
 
-    // Update button label to current
     const current = themes.find(t => t.id === currentId) || themes[0];
     if(current){
       dropdownSwatch.style.background = themeSwatchStyle(current.bg, current.text);
@@ -180,9 +170,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    await apiAdd(bg, text);       // saves + sets current on server
-    livePreview();                // apply immediately
-    await refreshThemes();        // repopulate list
+    await apiAdd(bg, text);      
+    livePreview();                
+    await refreshThemes();        
   });
 
   try{

@@ -24,17 +24,13 @@ def process_image_and_write_csvs(
     Returns metadata dict.
     """
     with Image.open(image_path) as img:
-        # Note: For animated images (e.g. GIF), Pillow opens frame 0 by default.
-        # This implementation processes only the first frame.
         img = normalize_image(img, include_alpha=include_alpha)
         width, height = img.size
         total_pixels = width * height
 
-        # getdata() yields tuples: (r,g,b) or (r,g,b,a)
         data_iter = img.getdata()
         color_counts: Counter = Counter()
 
-        # Write pixel-by-pixel CSV
         with open(pixels_csv_path, "w", newline=CONFIG.csv_newline, encoding="utf-8") as f:
             writer = csv.writer(f, dialect=CONFIG.csv_dialect)
 

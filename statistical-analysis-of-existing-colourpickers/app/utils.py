@@ -2,7 +2,6 @@ import os
 import json
 import secrets
 from typing import Any, Dict
-from collections import Counter  # noqa: F401 (kept if you want type hints elsewhere)
 
 from werkzeug.utils import secure_filename
 from PIL import Image

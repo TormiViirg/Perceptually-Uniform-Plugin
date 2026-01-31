@@ -50,7 +50,7 @@ h1{ margin-top: 0; }
   background: var(--msg-bg);
 }
 .msg.ok{ background: var(--msg-ok); }
-.msg.error{ background: var(--msg-error); }
+.msg.error{ background: var(--bg-color); }
 
 .dim{ color: var(--muted); }
 .mono{
@@ -137,7 +137,7 @@ th, td{
 th{
   position: sticky;
   top: 0;
-  background: var(--table-header-bg);
+  background: var(--bg-color);
 }
 
 .swatch{

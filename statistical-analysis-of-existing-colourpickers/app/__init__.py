@@ -25,7 +25,4 @@ def create_app() -> Flask:
     ensure_dirs()
     app.register_blueprint(main_bp)
 
-    app.config["TEMPLATES_AUTO_RELOAD"] = True  # remember to remove
-    app.jinja_env.auto_reload = True
-
     return app

@@ -188,7 +188,6 @@ def upload():
     file.save(image_path)
 
     try:
-        # Verify it's a valid image
         with Image.open(image_path) as img:
             img.verify()
 
