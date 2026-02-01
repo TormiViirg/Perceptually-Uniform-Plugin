@@ -1,0 +1,6 @@
+dotnet run --
+dotnet run -- --snip
+dotnet run -- --snip --out "D:\Shots"
+dotnet run -- --out "D:\Shots"
+dotnet run -- --set-default "D:\Shots"
+dotnet run -- --snip --set-default "D:\Shots"

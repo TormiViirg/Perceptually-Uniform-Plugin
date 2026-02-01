@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-class Program
+internal static class Program
 {
     [STAThread]
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
+
+        DpiAwareness.EnablePerMonitorV2BestEffort();
+
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        var virtualBounds = SystemInformation.VirtualScreen;
+        var virtualBounds = Win32Screen.GetVirtualScreenBoundsPx();
 
         Rectangle region;
         if (args.Any(a => a.Equals("--snip", StringComparison.OrdinalIgnoreCase)))
         {
             var snip = SnipForm.GetSelection(virtualBounds);
-            if (snip is null) return; 
+            if (snip is null) return;
             region = snip.Value;
         }
         else
@@ -35,24 +38,64 @@ class Program
             g.CopyFromScreen(region.Left, region.Top, 0, 0, region.Size, CopyPixelOperation.SourceCopy);
         }
 
-        using var outBmp = new Bitmap(capture.Width, capture.Height, PixelFormat.Format24bppRgb);
-        using (var g2 = Graphics.FromImage(outBmp))
+        var outputDir = OutputDirectory.GetOutputDirectory(args);
+        Directory.CreateDirectory(outputDir);
+
+        // BMP is uncompressed by default (BI_RGB). This avoids any lossy artifacts.
+        var path = Path.Combine(outputDir, $"screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.bmp");
+        capture.Save(path, ImageFormat.Bmp);
+
+        // Put it on the clipboard (Windows stores a bitmap/DIB; no JPEG-style loss).
+        Clipboard.SetImage(capture);
+
+        Console.WriteLine($"Saved: {path}");
+    }
+}
+
+internal static class OutputDirectory
+{
+    private static string ConfigPath()
+        => Path.Combine(AppContext.BaseDirectory, "screenshottool.config");
+
+    private static string BuiltInDefault()
+        => Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+
+    private static string ConfiguredDefault()
+    {
+        var cfg = ConfigPath();
+        if (File.Exists(cfg))
         {
-            g2.DrawImageUnscaled(capture, 0, 0);
+            var text = File.ReadAllText(cfg).Trim();
+            if (!string.IsNullOrWhiteSpace(text))
+                return text;
+        }
+        return BuiltInDefault();
+    }
+
+    private static void SetConfiguredDefault(string path)
+    {
+        Directory.CreateDirectory(path);
+        File.WriteAllText(ConfigPath(), path);
+    }
+
+    public static string GetOutputDirectory(string[] args)
+    {
+        var setIdx = Array.FindIndex(args, a => a.Equals("--set-default", StringComparison.OrdinalIgnoreCase));
+        if (setIdx >= 0 && setIdx + 1 < args.Length && !string.IsNullOrWhiteSpace(args[setIdx + 1]))
+        {
+            var newDefault = Path.GetFullPath(args[setIdx + 1]);
+            SetConfiguredDefault(newDefault);
+            return newDefault;
         }
 
-        var path = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            $"screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.bmp"
-        );
+        var outIdx = Array.FindIndex(args, a =>
+            a.Equals("--out", StringComparison.OrdinalIgnoreCase) ||
+            a.Equals("--dir", StringComparison.OrdinalIgnoreCase));
 
-        var bmpCodec = ImageCodecInfo.GetImageEncoders()
-            .First(c => c.FormatID == ImageFormat.Bmp.Guid);
+        if (outIdx >= 0 && outIdx + 1 < args.Length && !string.IsNullOrWhiteSpace(args[outIdx + 1]))
+            return Path.GetFullPath(args[outIdx + 1]);
 
-        outBmp.Save(path, bmpCodec, null);
-
-        Clipboard.SetImage(outBmp);
-        Console.WriteLine($"Saved: {path}");
+        return ConfiguredDefault();
     }
 }
 
@@ -71,7 +114,7 @@ internal sealed class SnipForm : Form
 
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.Manual;
-        Bounds = virtualBounds;                 
+        Bounds = virtualBounds;
         TopMost = true;
         ShowInTaskbar = false;
         DoubleBuffered = true;
@@ -157,7 +200,7 @@ internal sealed class SnipForm : Form
 
         var rect = NormalizeRect(_start.Value, _current);
 
-        using (var path = new GraphicsPath(FillMode.Alternate))
+        using (var path = new System.Drawing.Drawing2D.GraphicsPath(System.Drawing.Drawing2D.FillMode.Alternate))
         {
             path.AddRectangle(ClientRectangle);
             path.AddRectangle(rect);
@@ -167,19 +210,7 @@ internal sealed class SnipForm : Form
         }
 
         using (var pen = new Pen(Color.DeepSkyBlue, 2))
-        {
             e.Graphics.DrawRectangle(pen, rect);
-        }
-
-        var label = $"{rect.Width} × {rect.Height}";
-        var size = e.Graphics.MeasureString(label, Font);
-        var labelRect = new RectangleF(rect.X, rect.Y - size.Height - 6, size.Width + 10, size.Height + 6);
-        if (labelRect.Y < 0) labelRect.Y = rect.Y + 6;
-
-        using (var bg = new SolidBrush(Color.FromArgb(170, Color.Black)))
-            e.Graphics.FillRectangle(bg, labelRect);
-        using (var fg = new SolidBrush(Color.White))
-            e.Graphics.DrawString(label, Font, fg, labelRect.X + 5, labelRect.Y + 3);
 
         base.OnPaint(e);
     }
@@ -203,5 +234,52 @@ internal sealed class SnipForm : Form
     {
         using var f = new SnipForm(virtualBounds);
         return f.ShowDialog() == DialogResult.OK ? f.SelectedRectangle : (Rectangle?)null;
+    }
+}
+
+internal static class DpiAwareness
+{
+    private static readonly IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = new IntPtr(-4);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetProcessDpiAwarenessContext(IntPtr value);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetProcessDPIAware();
+
+    public static void EnablePerMonitorV2BestEffort()
+    {
+        try
+        {
+            SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+        }
+        catch (EntryPointNotFoundException)
+        {
+            try { SetProcessDPIAware(); } catch { /* ignore */ }
+        }
+        catch
+        {
+            // Non-fatal; continue.
+        }
+    }
+}
+
+internal static class Win32Screen
+{
+    private const int SM_XVIRTUALSCREEN = 76;
+    private const int SM_YVIRTUALSCREEN = 77;
+    private const int SM_CXVIRTUALSCREEN = 78;
+    private const int SM_CYVIRTUALSCREEN = 79;
+
+    [DllImport("user32.dll")]
+    private static extern int GetSystemMetrics(int nIndex);
+
+    public static Rectangle GetVirtualScreenBoundsPx()
+    {
+        var x = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        var y = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        var w = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+        var h = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+        return new Rectangle(x, y, w, h);
     }
 }
