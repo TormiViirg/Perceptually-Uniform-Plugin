@@ -1,0 +1,88 @@
+:root {
+    --px: 1px; 
+    --bg: #0f0f10;
+    --panel: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.12);
+    --text: #eaeaea;
+    --muted: #bdbdbd;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px);
+    background: linear-gradient(to bottom, rgba(15,15,16,0.95), rgba(15,15,16,0.70));
+    border-bottom: 1px solid var(--border);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+}
+
+label { 
+    font-size: 13px; 
+    color: var(--muted);
+}
+
+input[ 
+    type = "range"
+] { 
+    width: 160px; 
+}
+
+.stat { 
+    font-size: 13px; 
+    color: var(--muted); 
+}
+
+.viewport {
+    height: calc(100vh - 64px);
+    overflow: auto; 
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.stage {
+    padding: 16px;
+    width: max-content;
+    height: max-content;
+}
+
+canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: #000000;
+}
+
+.hint {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+code { 
+    color: #ffffff; 
+}

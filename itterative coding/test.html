@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>All sRGB Colors (4096×4096 atlas)</title>
+  <script src="render.js" defer></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="row">
+      <div class="chip">
+        <label for="px">Screen pixel size</label>
+        <input id="px" type="range" min="1" max="16" value="1" />
+        <span class="stat" id="pxVal">1</span>
+      </div>
+
+      <div class="chip">
+        <span class="stat" id="info">…</span>
+      </div>
+
+      <div class="chip">
+        <span class="stat" id="hover">Hover: —</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="viewport" id="viewport">
+    <div class="stage">
+      <canvas id="c"></canvas>
+      <div class="hint">
+        This atlas contains 
+        <code>
+            256³ = 16,777,216
+        </code> 
+        unique sRGB colors exactly once in a 
+        <code>
+            4096×4096
+        </code>
+        grid.
+
+        White 
+        <code>
+            (255,255,255)
+        </code> 
+        is the 
+        <b>
+            bottom-right
+        </b>
+        pixel (<code>x=4095,y=4095</code>).
+      </div>
+    </div>
+  </div>
+</body>
+</html>
