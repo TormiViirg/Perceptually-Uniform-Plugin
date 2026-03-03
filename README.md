@@ -1,27 +1,32 @@
 # Perceptually-Uniform-Plugin
+
 Pistikprogramm olemasolevale graafikatarkvarale, mis aitab kasutajal valida värvitooni eraldiseisva muutujana, mõjutamata seejuures teisi värviomadusi, kasutades selleks kaasaegseid värviteooria lähenemisi ja põhimõtteid. Töö käigus disainitakse ja arendatakse tööriistu, mis arvestavad tajuliselt ühtlaste värviruumide eripärade ja võimalustega.
 
 Repository koosneb hetkel kahest peamisest osast. Tööriistadest, mis on vajalikud varasemate ja autori poolt loodud värvivaliku tööriistade võrdluseks ja algoritmist, mis otsustab millised värvid kasutajaliideses kuvatakse. Lõpufaasides lisandub kolmas osa mis sisaldab algoritmi sisaldavat pistikuprogrammi ennast vastava kasutajaliidesega.
 
-Metodoloogiline lähenemine
+## Metodoloogiline lähenemine
 
-#Algoritm ja kasutajaliides:
+## Algoritm ja kasutajaliides:
+
 Eemaldame värvid mida inimsilm teistest värvidesteristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemat. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades, et tajupõhisem kate saavutada.
+
 Edasi toimub kasutajaliidese põhine filtreerimine heleduse põhjal. Hetkel on algoritmis kasutusel HSL lihtsuse jaoks, hiljem võetakse kasutusele tajupõhiselt ühtlasem OKLAB-i loonud töögrupi poolt loodud vastav värviruum.
+
 Seejärel prioritiseeritakse kasutajaliideses värvid, mis digimeedias ja graafika disainis kõige tihedamini kasutusel on läbi nende osakaalu suurendamise kasutaja liideses neile suurema pindala eraldades. Seda osa algoritmi veel listud pole.
+
 Hetkel pole veel otsusele jõutud selles osas kas ka liikuda üle HSL-lt inimtajule füsioloogiliselt lähemale vastandvärvide (opponent colour) teooria lähenemisele kasutaja liidese sliderite tasemel ja kui agressiivselt tasub värve ja tausta ringi seada, et kasutajaliideses maksimaalne hulk värve eristatav oleks. Tegemist on olulise küsimusega kuna RGB värvimudel on nn liitev (additive) ja ilma kontekstita pole võimalik seal kõiki värve kuvada nt pruun. 
 <img width="1016" height="921" alt="image" src="https://github.com/user-attachments/assets/0c8398be-55f0-4b73-8518-6fd8ad56f019" />
 
-Tööriistad:
+## Tööriistad:
 
-Veebiäpp kasutajaliideses olevate värvide analüüsiks ja csv formaati salvestamine hilisema statistika jaoks.
+### Veebiäpp kasutajaliideses olevate värvide analüüsiks ja csv formaati salvestamine hilisema statistika jaoks.
 
 Tausta värvi muutmis võimalus, et väride erisusi paremini näha, algoritmi ja sRGB katte tööriista testimise jaoks.
 <img width="1133" height="946" alt="image" src="https://github.com/user-attachments/assets/a95f9544-dc91-47e4-b4c7-6f0e53cef329" />
 Pakub ülevaate sellest mitu ainulaadset värvi pikslit on ja mis värvi need on, nende osakaalu kasutajaliideses andmete valideerimiseks enne edasisi statistilisi toimetusi väljastatud csv faili alusel.
 <img width="1389" height="972" alt="image" src="https://github.com/user-attachments/assets/a44414b5-b8dc-477d-bc5b-09df01adf061" />
 
-sRGB kattuvuse visualiseermis tööriist
+### sRGB kattuvuse visualiseermis tööriist
 
 Hetkel renderdab ekraanile kogu sRGB värvigamma ja loeb hiire all oleva värvi. Seda teeb hiire kordinaatide põhjal arvutades algse mappingu kordinaadi ja selle põhjal vastava värvi,mitte ekraanilt otse, kuna CORS ei luba. Lähipäevil lisandub csv failide laadimine ja võimalus sinna laetu salvestada bmp failina tööriista testimise ja andmeteagregeerimis eesmärgil. Rakendus näitab milline osa sRGB-st kaetud on visuaalsel viisil. 
 
