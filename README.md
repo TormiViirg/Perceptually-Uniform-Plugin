@@ -11,7 +11,8 @@ Repository koosneb hetkel kahest peamisest osast. Tööriistadest, mis on vajali
 Eemaldame värvid mida inimsilm teistest värvidest eristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemaid. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades, et tajupõhisem kate saavutada.
 
 Algne poolik disain:
-<img width="2418" height="1198" alt="Group 208" src="https://github.com/user-attachments/assets/5a1707c0-c1b1-4c29-b25a-862c00d17a40" />
+<img width="2476" height="1296" alt="Group 209" src="https://github.com/user-attachments/assets/00f0418d-4e8b-4faa-a5db-36cf008e3094" />
+
 
 Edasi toimub kasutajaliidese põhine filtreerimine heleduse põhjal. Hetkel on algoritmis kasutusel HSL lihtsuse jaoks, hiljem võetakse kasutusele tajupõhiselt ühtlasem OKLCH.
 
