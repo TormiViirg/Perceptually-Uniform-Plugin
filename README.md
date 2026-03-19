@@ -8,13 +8,16 @@ Repository koosneb hetkel kahest peamisest osast. Tööriistadest, mis on vajali
 
 ## Algoritm ja kasutajaliides:
 
-Eemaldame värvid mida inimsilm teistest värvidesteristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemat. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades, et tajupõhisem kate saavutada.
+Eemaldame värvid mida inimsilm teistest värvidest eristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemaid. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades, et tajupõhisem kate saavutada.
 
-Edasi toimub kasutajaliidese põhine filtreerimine heleduse põhjal. Hetkel on algoritmis kasutusel HSL lihtsuse jaoks, hiljem võetakse kasutusele tajupõhiselt ühtlasem OKLAB-i loonud töögrupi poolt loodud vastav värviruum.
+Algne poolik disain:
+<img width="2418" height="1198" alt="Group 208" src="https://github.com/user-attachments/assets/5a1707c0-c1b1-4c29-b25a-862c00d17a40" />
+
+Edasi toimub kasutajaliidese põhine filtreerimine heleduse põhjal. Hetkel on algoritmis kasutusel HSL lihtsuse jaoks, hiljem võetakse kasutusele tajupõhiselt ühtlasem OKLCH.
 
 Seejärel prioritiseeritakse kasutajaliideses värvid, mis digimeedias ja graafika disainis kõige tihedamini kasutusel on läbi nende osakaalu suurendamise kasutaja liideses neile suurema pindala eraldades. Seda osa algoritmi veel listud pole.
 
-Hetkel pole veel otsusele jõutud selles osas kas ka liikuda üle HSL-lt inimtajule füsioloogiliselt lähemale vastandvärvide (opponent colour) teooria lähenemisele kasutaja liidese sliderite tasemel ja kui agressiivselt tasub värve ja tausta ringi seada, et kasutajaliideses maksimaalne hulk värve eristatav oleks. Tegemist on olulise küsimusega kuna RGB värvimudel on nn liitev (additive) ja ilma kontekstita pole võimalik seal kõiki värve kuvada nt pruun. 
+Hetkel pole veel otsusele jõutud selles osas  kui agressiivselt tasub värve ja tausta ringi seada, et kasutajaliideses maksimaalne hulk värve eristatav oleks. Tegemist on olulise küsimusega kuna RGB värvimudel on nn liitev (additive) ja ilma kontekstita pole võimalik seal kõiki värve kuvada nt pruun. 
 <img width="1016" height="921" alt="image" src="https://github.com/user-attachments/assets/0c8398be-55f0-4b73-8518-6fd8ad56f019" />
 
 ## Tööriistad:
