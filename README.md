@@ -4,11 +4,34 @@ Pistikprogramm olemasolevale graafikatarkvarale, mis aitab kasutajal valida vär
 
 Repository koosneb hetkel kahest peamisest osast. Tööriistadest, mis on vajalikud varasemate ja autori poolt loodud värvivaliku tööriistade võrdluseks ja algoritmist, mis otsustab millised värvid kasutajaliideses kuvatakse. Lõpufaasides lisandub kolmas osa mis sisaldab algoritmi sisaldavat pistikuprogrammi ennast vastava kasutajaliidesega.
 
-## Metodoloogiline lähenemine
+## Lahendatav probleem
+
+Praegu puuduvad disaineritel tõhusad ja intuitiivsed tööriistad, mis võimaldaksid värvitooni valida või muuta ilma teisi värviomadusi mõjutamata ja vastupidi värvimudelis peamistes graafilise disaini tarkvarades. Selle tulemusel võivad muudatused, mis kasutaja eeldusel mõjutavad vaid värvitooni, tajutavalt muuta ka värvi heledust või küllastust. See lahkheli inimtaju ja mudeli vahel muudab värviga töötamise disainiprojektides ebatäpseks, puudulikuks värvide valiku osas ja aeganõudvaks. Sellest tulenevalt käituvad ka genereeritud värviüleminekud värvivaliku tööriistade kasutajaliideses etteennustamatult.
+
+<img width="749" height="619" alt="image" src="https://github.com/user-attachments/assets/bdfcfbce-4769-47b8-84d5-2bd7b8a02b11" />
+Allikas: https://bottosson.github.io/posts/oklab/
+
+Probleemi süvendab ka värviruumide kohati liigselt detailne värvide eraldusvõime, mis on ühtlane kogu kaetavas ulatuses. Tulenevalt sellest, et nägemissüsteem on jällegi ebaühtlane värvide eristamisvõimes ja eristab mõndasid värvi piirkondi kõrgema eraldusvõimega kui teisi, on automaatselt genereeritud värviüleminek, kasutaja vaatepildist kasutajaliideses kallutatud just ebaolulistele värvide suunas, selle asemel, et just suurendada oluliste osakaalu vähem oluliste arvelt tajupõhiselt ühtlase jaotuseni jõudmiseks või isegi tahtlikult raskesti eristatavate värvide alaesindadamiseks. Mis tähendab, et detailsust vajavad piirkonnad on esindatud sama osakaaluga kui need, mis seda ei vaja, mis viib olukorrani kus kõrgema bitti sagedusega värviruumide puhul on värve mida kasutaja ei saa kasutajaliideses valida oma töö raames kasutamiseks, olgugi, et monitor on võimeline neid kuvama. Selline naivistlik lähenemine pole jätkusuutlik raisatud ekraaniruumi tõttu, eriti kõrgema bit-i sagedusega ekraanide puhul. Tulenevalt asjaolust, et tegemist on pistikprogrammiga peab värvivaliku tööriist ka ideaalis mahtuma selleks kasutajaliideses varasemalt ettemääratud piirkonda.
+
+<img width="530" height="589" alt="Group 42 (6)" src="https://github.com/user-attachments/assets/528b390a-8112-4744-951f-f1536e3ba157" />
+
+Siis on veel hunnik väikseid asju nagu võimalus värviruumi piirkondi tööks välja valida ja salvestada tiimiliikmetega jagatavas formaadis, kus on võimalik värvidele kirjeldusi lisada, näiteks brändi värvide puhul. Võimaldab sisse ostetud arenduse kallal töötavatel disaineritel näha kasutajaliidese tasemel lubatud värve ja konteksti kus neid kasutada tohib rakenduse siseselt.
+
+<img width="749" height="490" alt="image" src="https://github.com/user-attachments/assets/66ed768e-d409-4541-a91b-6257ffdd8984" />
+
+Allikas: https://www.figma.com/files/team/1362368493098064381/resources/community/file/912837788133317724
+
+Eyedropper tööriist võimaldab mitut värvi korraga valida ja paletti lisada. Sisse ehitatud värviharmoonia soovitused tajupõhiselt ühtlase värviruumi põhjal.
+
+Võrdlus kahe teise varasema värvimudeliga <img width="327" height="200" alt="image" src="https://github.com/user-attachments/assets/895b306f-ade0-47cd-a20a-cb20ee4e96bb" />
+
+Allikas: https://evannorton.github.io/Acerolas-Epic-Color-Palettes/
+
 
 ## Algoritm ja kasutajaliides:
 
-Eemaldame värvid mida inimsilm teistest värvidest eristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemaid. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades, et tajupõhisem kate saavutada.
+Eemaldame värvid mida inimsilm teistest värvidest eristada ei suuda kasutajaliideses. Selleks on hetkel plaaanis kasutada monitoride kvaliteedi kontrollis kasutusel olevaid valemeid, kirjutamise hetkel on kasutusel delta94 lihtuse huvides, aga hiljem on plaanis kasutada kaasaegsemaid. Kirjutamise hetkel ei ole autor ühtegi kasutajaliidest leidnud, mis sellist väljajätu kriteeriumit kasutaks, levinum on lihtsalt värvi gradienti kasutada, healjuhul lab-i kasutades kui on soovi tajupõhisema katte järele.
+
 
 Algne poolik disain:
 <img width="2476" height="1296" alt="Group 209" src="https://github.com/user-attachments/assets/00f0418d-4e8b-4faa-a5db-36cf008e3094" />
